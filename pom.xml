@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.fnf</groupId>
-	<artifactId>cloud-task-app</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>cloud-task-app</name>
-	<description>cloud-task-app</description>
+	<artifactId>ec-cloud-task-app</artifactId>
+	<version>1.1.3</version>
+	<name>ec-cloud-task-app</name>
+	<description>ec-cloud-task-app</description>
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.1</spring-cloud.version>
