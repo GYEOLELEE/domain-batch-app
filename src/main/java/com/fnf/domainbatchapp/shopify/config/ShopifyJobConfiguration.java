@@ -88,35 +88,68 @@ public class ShopifyJobConfiguration {
             return RepeatStatus.FINISHED;
         };
     }
-        @Bean
-        public Job shopifyStockJob() {
-            return new JobBuilder("ShopifyStockJob", jobRepository)
-                    .incrementer(new RunIdIncrementer())
-                    .start(shopifyStockStep(null))
-                    .build();
-        }
 
-        @Bean
-        public Step shopifyStockStep(@Qualifier("transactionManager") PlatformTransactionManager txManager) {
-            return new StepBuilder("ShopifyStockStep", jobRepository)
-                    .tasklet(shopifyStockTasklet(), txManager)
-                    .build();
-        }
+    @Bean
+    public Job shopifyStockJob() {
+        return new JobBuilder("ShopifyStockJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(shopifyStockStep(null))
+                .build();
+    }
 
-        @Bean
-        @StepScope
-        public Tasklet shopifyStockTasklet() {
-            return (contribution, chunkContext) -> {
+    @Bean
+    public Step shopifyStockStep(@Qualifier("transactionManager") PlatformTransactionManager txManager) {
+        return new StepBuilder("ShopifyStockStep", jobRepository)
+                .tasklet(shopifyStockTasklet(), txManager)
+                .build();
+    }
 
-                String second = (String) chunkContext.getStepContext()
-                        .getJobParameters()
-                        .get("second");
-                int secondInt = ObjectUtils.isEmpty(second) ? 1 : Integer.parseInt(second);
-                log.info("second, {}!", secondInt);
-                Thread.sleep(1_000L * secondInt);
+    @Bean
+    @StepScope
+    public Tasklet shopifyStockTasklet() {
+        return (contribution, chunkContext) -> {
 
-                log.info("쇼피파이 재고전송 shopiStockTasklet : second, {}", second);
-                return RepeatStatus.FINISHED;
-            };
-        }
+            String second = (String) chunkContext.getStepContext()
+                    .getJobParameters()
+                    .get("second");
+            int secondInt = ObjectUtils.isEmpty(second) ? 1 : Integer.parseInt(second);
+            log.info("second, {}!", secondInt);
+            Thread.sleep(1_000L * secondInt);
+
+            log.info("쇼피파이 재고전송 shopiStockTasklet : second, {}", second);
+            return RepeatStatus.FINISHED;
+        };
+    }
+
+    @Bean
+    public Job shopifyCancelJob() {
+        return new JobBuilder("ShopifyCancelJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(shopifyCancelStep(null))
+                .build();
+    }
+
+    @Bean
+    public Step shopifyCancelStep(@Qualifier("transactionManager") PlatformTransactionManager txManager) {
+        return new StepBuilder("ShopifyCancelStep", jobRepository)
+                .tasklet(shopifyCancelTasklet(), txManager)
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public Tasklet shopifyCancelTasklet() {
+        return (contribution, chunkContext) -> {
+
+            String second = (String) chunkContext.getStepContext()
+                    .getJobParameters()
+                    .get("second");
+            int secondInt = ObjectUtils.isEmpty(second) ? 1 : Integer.parseInt(second);
+            log.info("second, {}!", secondInt);
+            Thread.sleep(1_000L * secondInt);
+
+            log.info("쇼피파이 취소수집 shopifyCancelTasklet : second, {}", second);
+            return RepeatStatus.FINISHED;
+        };
+    }
 }

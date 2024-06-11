@@ -118,4 +118,36 @@ public class NaverJobConfiguration {
             return RepeatStatus.FINISHED;
         };
     }
+
+    @Bean
+    public Job naverCancelJob() {
+        return new JobBuilder("NaverCancelJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(naverCancelStep(null))
+                .build();
+    }
+
+    @Bean
+    public Step naverCancelStep(@Qualifier("transactionManager") PlatformTransactionManager txManager) {
+        return new StepBuilder("NaverCancelStep", jobRepository)
+                .tasklet(naverCancelTasklet(), txManager)
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public Tasklet naverCancelTasklet() {
+        return (contribution, chunkContext) -> {
+
+            String second = (String) chunkContext.getStepContext()
+                    .getJobParameters()
+                    .get("second");
+            int secondInt = ObjectUtils.isEmpty(second) ? 1 : Integer.parseInt(second);
+            log.info("second, {}!", secondInt);
+            Thread.sleep(1_000L * secondInt);
+
+            log.info("네이버 취소수집 naverCancelTasklet : second, {}", second);
+            return RepeatStatus.FINISHED;
+        };
+    }
 }
