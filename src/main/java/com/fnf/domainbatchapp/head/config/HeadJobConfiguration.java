@@ -118,4 +118,36 @@ public class HeadJobConfiguration {
             return RepeatStatus.FINISHED;
         };
     }
+
+    @Bean
+    public Job headCancelJob() {
+        return new JobBuilder("HeadCancelJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(headCancelStep(null))
+                .build();
+    }
+
+    @Bean
+    public Step headCancelStep(@Qualifier("transactionManager") PlatformTransactionManager txManager) {
+        return new StepBuilder("HeadCancelStep", jobRepository)
+                .tasklet(headCancelTasklet(), txManager)
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public Tasklet headCancelTasklet() {
+        return (contribution, chunkContext) -> {
+
+            String second = (String) chunkContext.getStepContext()
+                    .getJobParameters()
+                    .get("second");
+            int secondInt = ObjectUtils.isEmpty(second) ? 1 : Integer.parseInt(second);
+            log.info("second, {}!", secondInt);
+            Thread.sleep(1_000L * secondInt);
+
+            log.info("자사몰 취소수집 headCancelTasklet : second, {}", second);
+            return RepeatStatus.FINISHED;
+        };
+    }
 }
