@@ -1,5 +1,6 @@
 package com.fnf.domainbatchapp;
 
+import com.fnf.domainbatchapp.ec.incrementer.CustomJobParametersIncrementer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -23,33 +24,6 @@ import org.springframework.util.ObjectUtils;
 public class JobConfiguration {
 
     private final JobRepository jobRepository;
-
-    @Bean
-    public Job sayGoodByeJob() {
-        return new JobBuilder("SayGoodByeJob", jobRepository)
-                .incrementer(new RunIdIncrementer())
-                .start(sayGoodByeStep(null))
-                .build();
-    }
-
-    @Bean
-    public Step sayGoodByeStep(@Qualifier("transactionManager") PlatformTransactionManager txManager) {
-        return new StepBuilder("SayGoodByeStep", jobRepository)
-                .tasklet(sayGoodByeTasklet(), txManager)
-                .build();
-    }
-
-    @Bean
-    @StepScope
-    public Tasklet sayGoodByeTasklet() {
-        return (contribution, chunkContext) -> {
-            String name = (String) chunkContext.getStepContext()
-                    .getJobParameters()
-                    .get("name");
-            log.info("GoodBye, {}!", name == null ? "Cloud Task" : name);
-            return RepeatStatus.FINISHED;
-        };
-    }
 
     @Bean
     public Job hourJob() {
