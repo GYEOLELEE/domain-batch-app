@@ -1,6 +1,5 @@
 package com.fnf.domainbatchapp;
 
-import com.fnf.domainbatchapp.ec.incrementer.CustomJobParametersIncrementer;
 import com.fnf.domainbatchapp.ec.incrementer.MinuteJobTimestamper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
