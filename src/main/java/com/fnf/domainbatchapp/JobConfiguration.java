@@ -1,6 +1,7 @@
 package com.fnf.domainbatchapp;
 
 import com.fnf.domainbatchapp.ec.incrementer.CustomJobParametersIncrementer;
+import com.fnf.domainbatchapp.ec.incrementer.MinuteJobTimestamper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -28,7 +29,7 @@ public class JobConfiguration {
     @Bean
     public Job hourJob() {
         return new JobBuilder("HourJob", jobRepository)
-                .incrementer(new CustomJobParametersIncrementer())
+                .incrementer(new RunIdIncrementer())
                 .start(hourStep(null))
                 .build();
     }
@@ -49,12 +50,35 @@ public class JobConfiguration {
             return RepeatStatus.FINISHED;
         };
     }
+    @Bean
+    public Job minuteJob() {
+        return new JobBuilder("MinuteJob", jobRepository)
+                .incrementer(new MinuteJobTimestamper())
+                .start(minuteStep(null))
+                .build();
+    }
 
+    @Bean
+    public Step minuteStep(@Qualifier("transactionManager") PlatformTransactionManager txManager) {
+        return new StepBuilder("MinuteStep", jobRepository)
+                .tasklet(minuteTasklet(), txManager)
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public Tasklet minuteTasklet() {
+        return (contribution, chunkContext) -> {
+            log.info("minute! sleep 1 minute");
+            Thread.sleep(1000 * 60);
+            return RepeatStatus.FINISHED;
+        };
+    }
 
     @Bean
     public Job timeJob() {
         return new JobBuilder("TimeJob", jobRepository)
-                .incrementer(new CustomJobParametersIncrementer())
+                .incrementer(new RunIdIncrementer())
                 .start(timeStep(null))
                 .build();
     }
